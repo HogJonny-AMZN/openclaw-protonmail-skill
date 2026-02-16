@@ -31,10 +31,10 @@ import { registerTools } from './tools';
  */
 export interface ProtonMailConfig {
   /** ProtonMail account email (e.g., user@pm.me or user@protonmail.com) */
-  account: string;
+  account?: string;
   
   /** Bridge-generated password (NOT your ProtonMail password) */
-  bridgePassword: string;
+  bridgePassword?: string;
   
   /** IMAP host (default: 127.0.0.1) */
   imapHost?: string;
@@ -50,6 +50,31 @@ export interface ProtonMailConfig {
 }
 
 /**
+ * Load configuration from environment variables or passed config
+ */
+function loadConfig(config?: ProtonMailConfig): Required<Omit<ProtonMailConfig, 'account' | 'bridgePassword'>> & { account: string; bridgePassword: string } {
+  const account = config?.account || process.env.PROTONMAIL_ACCOUNT;
+  const bridgePassword = config?.bridgePassword || process.env.PROTONMAIL_BRIDGE_PASSWORD;
+  
+  if (!account) {
+    throw new Error('ProtonMail account not configured. Set PROTONMAIL_ACCOUNT env var or pass account in config.');
+  }
+  
+  if (!bridgePassword) {
+    throw new Error('ProtonMail Bridge password not configured. Set PROTONMAIL_BRIDGE_PASSWORD env var or pass bridgePassword in config.');
+  }
+  
+  return {
+    account,
+    bridgePassword,
+    imapHost: config?.imapHost || '127.0.0.1',
+    imapPort: config?.imapPort || 1143,
+    smtpHost: config?.smtpHost || '127.0.0.1',
+    smtpPort: config?.smtpPort || 1025
+  };
+}
+
+/**
  * Main skill class for ProtonMail integration
  * 
  * Manages IMAP and SMTP connections to Proton Mail Bridge and provides
@@ -62,29 +87,35 @@ export class ProtonMailSkill {
   /**
    * Create a new ProtonMail skill instance
    * 
-   * @param config - Configuration with account credentials and Bridge connection details
+   * @param config - Optional configuration. If not provided, reads from environment variables.
    * 
    * @remarks
    * The Bridge password is separate from your ProtonMail password. Get it from
    * Proton Mail Bridge → Account Settings → Mailbox Configuration.
+   * 
+   * Configuration priority:
+   * 1. Passed config object
+   * 2. Environment variables (PROTONMAIL_ACCOUNT, PROTONMAIL_BRIDGE_PASSWORD)
    */
-  constructor(config: ProtonMailConfig) {
+  constructor(config?: ProtonMailConfig) {
+    const fullConfig = loadConfig(config);
+    
     const imapConfig = {
-      user: config.account,
-      password: config.bridgePassword,
-      host: config.imapHost || '127.0.0.1',
-      port: config.imapPort || 1143,
+      user: fullConfig.account,
+      password: fullConfig.bridgePassword,
+      host: fullConfig.imapHost,
+      port: fullConfig.imapPort,
       tls: true,
       tlsOptions: { rejectUnauthorized: false } // Bridge uses self-signed cert
     };
 
     const smtpConfig = {
-      host: config.smtpHost || '127.0.0.1',
-      port: config.smtpPort || 1025,
+      host: fullConfig.smtpHost,
+      port: fullConfig.smtpPort,
       secure: false,
       auth: {
-        user: config.account,
-        pass: config.bridgePassword
+        user: fullConfig.account,
+        pass: fullConfig.bridgePassword
       },
       tls: { rejectUnauthorized: false }
     };

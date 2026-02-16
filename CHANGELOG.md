@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MIT License
 - TypeScript build configuration
 - Example configuration files
+- Environment variable support (PROTONMAIL_ACCOUNT, PROTONMAIL_BRIDGE_PASSWORD)
+- Proper OpenClaw skill config format (`skills.entries.protonmail`)
+
+### Changed
+- Updated nodemailer to v8.0.1 (security fixes)
+- Installation script now copies files instead of symlinking
+- Config reads from environment variables (OpenClaw standard pattern)
+- Made config parameter optional (reads from env vars)
+- Metadata in SKILL.md now single-line JSON (OpenClaw requirement)
+
+### Fixed
+- Added missing @types/mailparser dependency
+- Security vulnerabilities in nodemailer
+- Installation path (now uses ~/.openclaw/skills/protonmail)
+- Config format (now uses skills.entries.* structure)
+- Build errors due to missing type definitions
 
 ### Notes
 - This is a pre-release version

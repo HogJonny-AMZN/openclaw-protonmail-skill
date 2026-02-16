@@ -1,13 +1,13 @@
 {
   "skills": {
-    "protonmail": {
-      "enabled": true,
-      "account": "your-email@pm.me",
-      "bridgePassword": "YOUR-BRIDGE-PASSWORD-HERE",
-      "imapHost": "127.0.0.1",
-      "imapPort": 1143,
-      "smtpHost": "127.0.0.1",
-      "smtpPort": 1025
+    "entries": {
+      "protonmail": {
+        "enabled": true,
+        "env": {
+          "PROTONMAIL_ACCOUNT": "your-email@pm.me",
+          "PROTONMAIL_BRIDGE_PASSWORD": "YOUR-BRIDGE-PASSWORD-HERE"
+        }
+      }
     }
   }
 }

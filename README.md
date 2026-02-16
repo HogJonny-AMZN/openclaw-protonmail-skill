@@ -90,16 +90,24 @@ Add to your OpenClaw config (`~/.openclaw/openclaw.json`):
 ```json
 {
   "skills": {
-    "protonmail": {
-      "enabled": true,
-      "account": "your-email@pm.me",
-      "bridgePassword": "bridge-generated-password"
+    "entries": {
+      "protonmail": {
+        "enabled": true,
+        "env": {
+          "PROTONMAIL_ACCOUNT": "your-email@pm.me",
+          "PROTONMAIL_BRIDGE_PASSWORD": "bridge-generated-password"
+        }
+      }
     }
   }
 }
 ```
 
-**Security Note:** Credentials are stored locally. Never commit your config with real credentials to version control.
+**Important Notes:**
+- Use `skills.entries.protonmail` (not `skills.protonmail`)
+- Credentials are stored locally in your OpenClaw config
+- Never commit your config with real credentials to version control
+- The Bridge password is separate from your ProtonMail password
 
 ## Usage
 

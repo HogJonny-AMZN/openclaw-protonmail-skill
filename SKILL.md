@@ -2,25 +2,7 @@
 name: protonmail
 description: ProtonMail integration via Proton Mail Bridge for reading and sending encrypted emails.
 homepage: https://github.com/rvacyber/openclaw-protonmail-skill
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🔐",
-        "requires": { "apps": ["Proton Mail Bridge"] },
-        "install":
-          [
-            {
-              "id": "brew-bridge",
-              "kind": "brew",
-              "formula": "proton-mail-bridge",
-              "bins": [],
-              "label": "Install Proton Mail Bridge (macOS)",
-              "cask": true
-            },
-          ],
-      },
-  }
+metadata: {"openclaw":{"emoji":"🔐","requires":{"env":["PROTONMAIL_ACCOUNT","PROTONMAIL_BRIDGE_PASSWORD"]},"install":[{"id":"brew-bridge","kind":"brew","formula":"proton-mail-bridge","bins":[],"label":"Install Proton Mail Bridge (macOS)","cask":true}]}}
 ---
 
 # ProtonMail Skill
@@ -44,10 +26,14 @@ Use ProtonMail for secure email via Proton Mail Bridge.
    ```json
    {
      "skills": {
-       "protonmail": {
-         "enabled": true,
-         "account": "your-email@pm.me",
-         "bridgePassword": "bridge-generated-password"
+       "entries": {
+         "protonmail": {
+           "enabled": true,
+           "env": {
+             "PROTONMAIL_ACCOUNT": "your-email@pm.me",
+             "PROTONMAIL_BRIDGE_PASSWORD": "bridge-generated-password"
+           }
+         }
        }
      }
    }
@@ -56,6 +42,7 @@ Use ProtonMail for secure email via Proton Mail Bridge.
    **Get Bridge credentials:**
    - In Bridge, click your account → Mailbox configuration
    - Copy the IMAP password (NOT your ProtonMail password)
+   - Use `skills.entries.protonmail` (not `skills.protonmail`)
 
 ## Common Commands
 

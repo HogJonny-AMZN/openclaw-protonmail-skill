@@ -8,7 +8,18 @@
 import ProtonMailSkill from '../src/index';
 
 describe('ProtonMailSkill', () => {
-  it('should instantiate with valid config', () => {
+  // Set test environment variables
+  beforeAll(() => {
+    process.env.PROTONMAIL_ACCOUNT = 'test@pm.me';
+    process.env.PROTONMAIL_BRIDGE_PASSWORD = 'test-password';
+  });
+  
+  afterAll(() => {
+    delete process.env.PROTONMAIL_ACCOUNT;
+    delete process.env.PROTONMAIL_BRIDGE_PASSWORD;
+  });
+  
+  it('should instantiate with config object', () => {
     const skill = new ProtonMailSkill({
       account: 'test@pm.me',
       bridgePassword: 'test-password'
@@ -17,13 +28,9 @@ describe('ProtonMailSkill', () => {
     expect(skill).toBeDefined();
   });
   
-  it('should use default IMAP/SMTP ports', () => {
-    const skill = new ProtonMailSkill({
-      account: 'test@pm.me',
-      bridgePassword: 'test-password'
-    });
+  it('should instantiate from environment variables', () => {
+    const skill = new ProtonMailSkill();
     
-    // Verify defaults are applied (internal check)
     expect(skill).toBeDefined();
   });
   
@@ -40,12 +47,23 @@ describe('ProtonMailSkill', () => {
 });
 
 describe('Configuration validation', () => {
-  it('should require account email', () => {
+  it('should throw error when account is missing', () => {
+    delete process.env.PROTONMAIL_ACCOUNT;
+    
     expect(() => {
-      new ProtonMailSkill({
-        account: '',
-        bridgePassword: 'test'
-      });
-    }).not.toThrow(); // TODO: Add validation in constructor
+      new ProtonMailSkill({ bridgePassword: 'test' });
+    }).toThrow('ProtonMail account not configured');
+    
+    process.env.PROTONMAIL_ACCOUNT = 'test@pm.me';
+  });
+  
+  it('should throw error when password is missing', () => {
+    delete process.env.PROTONMAIL_BRIDGE_PASSWORD;
+    
+    expect(() => {
+      new ProtonMailSkill({ account: 'test@pm.me' });
+    }).toThrow('ProtonMail Bridge password not configured');
+    
+    process.env.PROTONMAIL_BRIDGE_PASSWORD = 'test-password';
   });
 });
