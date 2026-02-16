@@ -136,8 +136,6 @@ export class IMAPClient {
    * @param unreadOnly - Filter to unread messages only
    * @returns Array of email metadata
    * 
-   * @todo Implement full IMAP FETCH operation
-   * 
    * @example
    * ```typescript
    * const emails = await imap.listInbox(10, true);
@@ -145,14 +143,69 @@ export class IMAPClient {
    * ```
    */
   async listInbox(limit = 10, unreadOnly = false): Promise<EmailMetadata[]> {
-    // TODO: Full implementation
-    // 1. Open INBOX with imap.openBox('INBOX', false, callback)
-    // 2. Search: unreadOnly ? ['UNSEEN'] : ['ALL']
-    // 3. Fetch headers for matching UIDs
-    // 4. Parse and return metadata
-    
-    // Stub return for now
-    return [];
+    return new Promise((resolve, reject) => {
+      this.imap.openBox('INBOX', true, (err, box) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const searchCriteria = unreadOnly ? ['UNSEEN'] : ['ALL'];
+        
+        this.imap.search(searchCriteria, (err, results) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          if (!results || results.length === 0) {
+            resolve([]);
+            return;
+          }
+
+          // Get the most recent messages up to limit
+          const uids = results.slice(-limit).reverse();
+          const emails: EmailMetadata[] = [];
+
+          const fetch = this.imap.fetch(uids, {
+            bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+            struct: true
+          });
+
+          fetch.on('message', (msg, seqno) => {
+            let buffer = '';
+            let uid = '';
+
+            msg.on('body', (stream) => {
+              stream.on('data', (chunk) => {
+                buffer += chunk.toString('utf8');
+              });
+            });
+
+            msg.once('attributes', (attrs) => {
+              uid = attrs.uid.toString();
+            });
+
+            msg.once('end', () => {
+              const header = Imap.parseHeader(buffer);
+              emails.push({
+                uid,
+                from: Array.isArray(header.from) ? header.from[0] : header.from || '',
+                subject: Array.isArray(header.subject) ? header.subject[0] : header.subject || '',
+                date: new Date(Array.isArray(header.date) ? header.date[0] : header.date || ''),
+                flags: []
+              });
+            });
+          });
+
+          fetch.once('error', reject);
+          
+          fetch.once('end', () => {
+            resolve(emails);
+          });
+        });
+      });
+    });
   }
 
   /**
@@ -162,8 +215,6 @@ export class IMAPClient {
    * @param limit - Maximum results
    * @returns Matching emails
    * 
-   * @todo Implement IMAP SEARCH with query parsing
-   * 
    * @example
    * Supported query formats:
    * - `from:alice@example.com` - Emails from sender
@@ -172,13 +223,116 @@ export class IMAPClient {
    * - `newer_than:7d` - Last 7 days
    */
   async search(query: string, limit = 10): Promise<EmailMetadata[]> {
-    // TODO: Full implementation
-    // 1. Parse query string into IMAP search criteria
-    // 2. Execute imap.search(criteria, callback)
-    // 3. Fetch matching message headers
-    // 4. Return results
+    return new Promise((resolve, reject) => {
+      this.imap.openBox('INBOX', true, (err, box) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        // Parse query into IMAP criteria
+        const criteria = this.parseSearchQuery(query);
+        
+        this.imap.search(criteria, (err, results) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          if (!results || results.length === 0) {
+            resolve([]);
+            return;
+          }
+
+          const uids = results.slice(-limit).reverse();
+          const emails: EmailMetadata[] = [];
+
+          const fetch = this.imap.fetch(uids, {
+            bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+            struct: true
+          });
+
+          fetch.on('message', (msg, seqno) => {
+            let buffer = '';
+            let uid = '';
+
+            msg.on('body', (stream) => {
+              stream.on('data', (chunk) => {
+                buffer += chunk.toString('utf8');
+              });
+            });
+
+            msg.once('attributes', (attrs) => {
+              uid = attrs.uid.toString();
+            });
+
+            msg.once('end', () => {
+              const header = Imap.parseHeader(buffer);
+              emails.push({
+                uid,
+                from: Array.isArray(header.from) ? header.from[0] : header.from || '',
+                subject: Array.isArray(header.subject) ? header.subject[0] : header.subject || '',
+                date: new Date(Array.isArray(header.date) ? header.date[0] : header.date || ''),
+                flags: []
+              });
+            });
+          });
+
+          fetch.once('error', reject);
+          
+          fetch.once('end', () => {
+            resolve(emails);
+          });
+        });
+      });
+    });
+  }
+
+  /**
+   * Parse search query string into IMAP criteria
+   * 
+   * @param query - User-friendly search query
+   * @returns IMAP search criteria array
+   * 
+   * @private
+   */
+  private parseSearchQuery(query: string): any[] {
+    const criteria: any[] = [];
+
+    // Simple parsing - extend this for more complex queries
+    if (query.includes('from:')) {
+      const match = query.match(/from:(\S+)/);
+      if (match) criteria.push(['FROM', match[1]]);
+    }
     
-    return [];
+    if (query.includes('subject:')) {
+      const match = query.match(/subject:(\S+)/);
+      if (match) criteria.push(['SUBJECT', match[1]]);
+    }
+    
+    if (query.includes('body:')) {
+      const match = query.match(/body:(\S+)/);
+      if (match) criteria.push(['BODY', match[1]]);
+    }
+
+    if (query.includes('newer_than:')) {
+      const match = query.match(/newer_than:(\d+)([dh])/);
+      if (match) {
+        const value = parseInt(match[1]);
+        const unit = match[2];
+        const date = new Date();
+        if (unit === 'd') date.setDate(date.getDate() - value);
+        else if (unit === 'h') date.setHours(date.getHours() - value);
+        criteria.push(['SINCE', date]);
+      }
+    }
+
+    // If no specific criteria, treat as subject search
+    if (criteria.length === 0) {
+      criteria.push(['SUBJECT', query]);
+    }
+
+    return criteria;
   }
 
   /**
@@ -189,8 +343,6 @@ export class IMAPClient {
    * 
    * @throws {Error} If message UID is invalid
    * 
-   * @todo Implement full message fetch and parsing
-   * 
    * @example
    * ```typescript
    * const email = await imap.readMessage('1234');
@@ -200,13 +352,28 @@ export class IMAPClient {
    * ```
    */
   async readMessage(messageId: string): Promise<ParsedMail> {
-    // TODO: Full implementation
-    // 1. Fetch message by UID: imap.fetch(messageId, { bodies: '' })
-    // 2. Stream message to simpleParser()
-    // 3. Extract text, HTML, attachments
-    // 4. Return structured ParsedMail object
-    
-    // Stub return
-    return {} as ParsedMail;
+    return new Promise((resolve, reject) => {
+      this.imap.openBox('INBOX', true, (err, box) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const fetch = this.imap.fetch(messageId, { bodies: '' });
+        
+        fetch.on('message', (msg) => {
+          msg.on('body', async (stream) => {
+            try {
+              const parsed = await simpleParser(stream as any);
+              resolve(parsed);
+            } catch (err) {
+              reject(err);
+            }
+          });
+        });
+
+        fetch.once('error', reject);
+      });
+    });
   }
 }

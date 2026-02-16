@@ -7,8 +7,6 @@
 
 Connect your OpenClaw agent to ProtonMail via Proton Mail Bridge.
 
-> ⚠️ **Status:** Early development (v0.1.0) — Core functionality in progress. Contributions welcome!
-
 ---
 
 ## Table of Contents
@@ -36,8 +34,8 @@ This skill enables OpenClaw to read, send, and manage emails through your Proton
 - ✉️ Read emails (inbox, sent, folders)
 - 📤 Send emails (plain text and HTML)
 - 💬 Reply to emails
-- 🔍 Search emails
-- 📎 Handle attachments (coming soon)
+- 🔍 Search emails (from, subject, body, date filters)
+- 📎 Read attachments (sending attachments: coming soon)
 - 🔒 Secure: Uses official Proton Bridge, credentials stored locally
 
 ## Requirements
@@ -61,13 +59,32 @@ Download from https://proton.me/mail/bridge
 
 ### 2. Configure Proton Mail Bridge
 
-1. Launch Proton Mail Bridge
-2. Sign in with your ProtonMail account
-3. Note the IMAP/SMTP credentials Bridge generates
+1. **Launch Proton Mail Bridge**
+   ```bash
+   open -a "Proton Mail Bridge"  # macOS
+   # or launch from Applications
+   ```
+
+2. **Sign in with your ProtonMail account**
+   - Enter your ProtonMail email and password
+   - Complete any 2FA if enabled
+
+3. **Skip email client setup**
+   - Bridge will show "Select your email client" (Apple Mail, Outlook, Thunderbird, Other)
+   - **Click "Setup later"** — we're connecting OpenClaw directly, not a desktop email client
+
+4. **Get your Bridge credentials**
+   - Open Bridge settings/preferences
+   - Select your account (e.g., `your-email@pm.me`)
+   - Go to "Mailbox configuration" or "IMAP/SMTP settings"
+   - Click "Show password" to reveal the Bridge-generated password
+   - **Important:** This is NOT your ProtonMail password — it's a separate password Bridge generates
+
+5. **Note your connection settings:**
    - IMAP: `127.0.0.1:1143`
    - SMTP: `127.0.0.1:1025`
    - Username: `your-email@pm.me`
-   - Password: Bridge-generated password (NOT your ProtonMail password)
+   - Password: Bridge-generated password (from step 4)
 
 ### 3. Install the Skill
 
@@ -171,7 +188,15 @@ openclaw-protonmail-skill/
 - **Proton Bridge runs locally** — No third-party services involved
 - **End-to-end encryption maintained** — Bridge decrypts locally, encrypted in transit to Proton servers
 - **Credentials never leave your machine** — Stored in OpenClaw config, never logged or transmitted
+- **Localhost-only connections** — IMAP/SMTP traffic stays on your machine (unencrypted localhost is acceptable)
 - **Open source** — Audit the code yourself
+
+### Security Notes
+
+- Bridge uses ports 1143 (IMAP) and 1025 (SMTP) on `127.0.0.1` (localhost only)
+- Current implementation uses plain connections (no TLS) because traffic never leaves your machine
+- Bridge password is separate from ProtonMail password (defense in depth)
+- Never commit `openclaw.json` with real credentials to version control
 
 ## Contributing
 

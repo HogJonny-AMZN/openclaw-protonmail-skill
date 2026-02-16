@@ -105,8 +105,8 @@ export class ProtonMailSkill {
       password: fullConfig.bridgePassword,
       host: fullConfig.imapHost,
       port: fullConfig.imapPort,
-      tls: true,
-      tlsOptions: { rejectUnauthorized: false } // Bridge uses self-signed cert
+      tls: false,
+      autotls: 'never' // Disable STARTTLS for now to test plain connection
     };
 
     const smtpConfig = {
