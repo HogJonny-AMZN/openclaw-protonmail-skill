@@ -41,6 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Links
 
-- [Latest Release](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/releases/latest)
-- [All Releases](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/releases)
-- [Issue Tracker](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/issues)
+- [Latest Release](https://github.com/rvacyber/openclaw-protonmail-skill/releases/latest)
+- [All Releases](https://github.com/rvacyber/openclaw-protonmail-skill/releases)
+- [Issue Tracker](https://github.com/rvacyber/openclaw-protonmail-skill/issues)

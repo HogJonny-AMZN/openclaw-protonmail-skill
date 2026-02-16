@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR-USERNAME/openclaw-protonmail-skill.git"
+    "url": "https://github.com/rvacyber/openclaw-protonmail-skill.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/issues"
+    "url": "https://github.com/rvacyber/openclaw-protonmail-skill/issues"
   },
-  "homepage": "https://github.com/YOUR-USERNAME/openclaw-protonmail-skill#readme",
+  "homepage": "https://github.com/rvacyber/openclaw-protonmail-skill#readme",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

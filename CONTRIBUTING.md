@@ -8,7 +8,7 @@ Thank you for considering contributing! This skill is built for the OpenClaw com
 
 If you find a bug:
 
-1. Check [existing issues](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/issues) first
+1. Check [existing issues](https://github.com/rvacyber/openclaw-protonmail-skill/issues) first
 2. If it's new, open an issue with:
    - Clear description of the problem
    - Steps to reproduce
@@ -73,7 +73,7 @@ Feature requests are welcome! Open an issue with:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/openclaw-protonmail-skill.git
+git clone https://github.com/rvacyber/openclaw-protonmail-skill.git
 cd openclaw-protonmail-skill
 
 # Install dependencies

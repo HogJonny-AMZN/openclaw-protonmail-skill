@@ -1,7 +1,7 @@
 ---
 name: protonmail
 description: ProtonMail integration via Proton Mail Bridge for reading and sending encrypted emails.
-homepage: https://github.com/YOUR-USERNAME/openclaw-protonmail-skill
+homepage: https://github.com/rvacyber/openclaw-protonmail-skill
 metadata:
   {
     "openclaw":

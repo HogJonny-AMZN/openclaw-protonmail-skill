@@ -1,6 +1,6 @@
 # ProtonMail Skill for OpenClaw
 
-[![CI](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/actions/workflows/ci.yml)
+[![CI](https://github.com/rvacyber/openclaw-protonmail-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/rvacyber/openclaw-protonmail-skill/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
@@ -73,7 +73,7 @@ Download from https://proton.me/mail/bridge
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR-USERNAME/openclaw-protonmail-skill.git
+git clone https://github.com/rvacyber/openclaw-protonmail-skill.git
 cd openclaw-protonmail-skill
 
 # Install dependencies
@@ -128,7 +128,7 @@ The skill provides these tool functions to OpenClaw:
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/openclaw-protonmail-skill.git
+git clone https://github.com/rvacyber/openclaw-protonmail-skill.git
 cd openclaw-protonmail-skill
 npm install
 npm run dev
@@ -181,13 +181,13 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Credits
 
-Created by **Jim Staley** ([@YOUR-GITHUB-USERNAME](https://github.com/YOUR-USERNAME)) for the OpenClaw community.
+Created by **Jim Staley** ([@YOUR-GITHUB-USERNAME](https://github.com/rvacyber)) for the OpenClaw community.
 
 Inspired by the [gog](https://github.com/steipete/gog) skill for Google Workspace.
 
 ## Support
 
-- 🐛 **Issues:** https://github.com/YOUR-USERNAME/openclaw-protonmail-skill/issues
+- 🐛 **Issues:** https://github.com/rvacyber/openclaw-protonmail-skill/issues
 - 💬 **Discussions:** https://github.com/openclaw/openclaw/discussions
 - 📖 **OpenClaw Docs:** https://docs.openclaw.ai
 
