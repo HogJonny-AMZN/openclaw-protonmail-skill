@@ -67,10 +67,10 @@ function loadConfig(config?: ProtonMailConfig): Required<Omit<ProtonMailConfig, 
   return {
     account,
     bridgePassword,
-    imapHost: config?.imapHost || '127.0.0.1',
-    imapPort: config?.imapPort || 1143,
-    smtpHost: config?.smtpHost || '127.0.0.1',
-    smtpPort: config?.smtpPort || 1025
+    imapHost: config?.imapHost || process.env.PROTONMAIL_IMAP_HOST || '127.0.0.1',
+    imapPort: config?.imapPort || parseInt(process.env.PROTONMAIL_IMAP_PORT || '1143', 10),
+    smtpHost: config?.smtpHost || process.env.PROTONMAIL_SMTP_HOST || '127.0.0.1',
+    smtpPort: config?.smtpPort || parseInt(process.env.PROTONMAIL_SMTP_PORT || '1025', 10)
   };
 }
 
@@ -100,10 +100,22 @@ export class ProtonMailSkill {
   constructor(config?: ProtonMailConfig) {
     const fullConfig = loadConfig(config);
     
-    // Security hardening: Proton Bridge must be localhost-only
-    const localHosts = new Set(['127.0.0.1', 'localhost', '::1']);
-    if (!localHosts.has(fullConfig.imapHost) || !localHosts.has(fullConfig.smtpHost)) {
-      throw new Error('Unsafe Bridge host configuration. IMAP/SMTP hosts must be localhost (127.0.0.1, localhost, or ::1).');
+    // Security hardening: Proton Bridge must be a trusted local host.
+    // Default: loopback only (127.0.0.1, localhost, ::1).
+    // To allow additional hosts (e.g. host.docker.internal for Docker deployments),
+    // set PROTONMAIL_TRUSTED_HOSTS to a comma-separated list of trusted hostnames.
+    // These must still be private/internal — never expose Bridge to the public internet.
+    const defaultTrustedHosts = new Set(['127.0.0.1', 'localhost', '::1']);
+    const extraHosts = (process.env.PROTONMAIL_TRUSTED_HOSTS || '')
+      .split(',').map(h => h.trim()).filter(Boolean);
+    const trustedHosts = new Set([...defaultTrustedHosts, ...extraHosts]);
+
+    if (!trustedHosts.has(fullConfig.imapHost) || !trustedHosts.has(fullConfig.smtpHost)) {
+      throw new Error(
+        `Unsafe Bridge host configuration. IMAP/SMTP hosts must be trusted local hosts ` +
+        `(default: 127.0.0.1, localhost, ::1). ` +
+        `For Docker deployments, add host.docker.internal to PROTONMAIL_TRUSTED_HOSTS.`
+      );
     }
 
     const imapConfig = {

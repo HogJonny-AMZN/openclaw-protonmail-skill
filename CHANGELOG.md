@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-18
+
+### Added
+- `PROTONMAIL_TRUSTED_HOSTS` env var — comma-separated list of additional allowed Bridge hosts
+  beyond the default loopback set (`127.0.0.1`, `localhost`, `::1`).
+  Enables Docker deployments where Bridge is reached via `host.docker.internal`.
+- `PROTONMAIL_IMAP_HOST`, `PROTONMAIL_IMAP_PORT`, `PROTONMAIL_SMTP_HOST`, `PROTONMAIL_SMTP_PORT`
+  env vars for full host/port configuration without code changes.
+
+### Changed
+- Host validation is now configurable via `PROTONMAIL_TRUSTED_HOSTS` rather than a hardcoded set.
+  Default behavior (loopback-only) is unchanged — this is purely additive.
+- Error message for unsafe host configuration now includes Docker guidance.
+
+### Notes
+- `host.docker.internal` is a private Docker-internal DNS alias; adding it to `PROTONMAIL_TRUSTED_HOSTS`
+  does not expose Bridge to the network. Traffic remains machine-local.
+
 ## [Unreleased]
 
 ### Changed
